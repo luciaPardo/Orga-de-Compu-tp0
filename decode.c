@@ -6,18 +6,31 @@
  */
 #include "conversor.h"
 
-int decode (char* input,char* output){
+int decode (char* input, char*output, int pipe){
 
-	FILE* entrada = fopen(input,"r");
+	int flag=0;
+	FILE* entrada;
+	FILE* salida;
+
+	if ((pipe == 0) || (pipe == 2)){
+		entrada = fopen(input,"r");
 		if (entrada == NULL) {
-		  fprintf(stderr,"Error al abrir el archivo fuente.\n");
-		  return 3;
+			  flag=2;
 		}
-	FILE* salida = fopen(output,"w");
+	} else {
+		entrada = stdin;
+	}
+	if ((pipe == 0) || (pipe == 1)) {
+		salida = fopen(output,"w");
 		if (salida == NULL) {
 			fprintf(stderr,"Error al abrir el archivo de salida.\n");
-			return 4;
+			flag=3;
 		}
+	} else {
+		salida = stdout;
+	}
+
+	if (flag == 0){
 	char c;
 	int decimalBase64,bits,multiplo8,caracteresASCII,posicionEnCadenaDeBits,decimalAscii;
 
@@ -73,13 +86,18 @@ int decode (char* input,char* output){
 
 	}
 
-	fclose(entrada);
-	fclose(salida);
+	if ((pipe == 0) || (pipe == 2)){
+		fclose(entrada);
+	}
+	if ((pipe == 0) || (pipe == 1)) {
+		fclose(salida);
+	}
 
 	free(caracterActualBinario);
 	caracterActualBinario=NULL;
 	free(cadenaDeBits);
 	cadenaDeBits=NULL;
+	}
 
-	return 0;
+	return flag;
 }

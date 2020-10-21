@@ -5,9 +5,6 @@
  *      Author: lucia
  */
 #include "conversor.h"
-#define VERSION 0
-#define MAX_BUFF 100
-
 
 void mensaje_ayuda() {
   	printf("Usage: \n");
@@ -26,59 +23,107 @@ void mensaje_ayuda() {
 
 
 int main(int argc, char *argv[]) {
-	char* input;
-	char* output;
-	int modo=0;
-	int flag=1;
+
+	int modo=0; 			//0:INFO,1:ENCODER,2:DECODER
+
+	char* inputName=NULL;
+	char* outputName=NULL;
+	int flag=0;
+	int ejecutar=0; 		//0:Ejecucion,1:ErrorParametros,2ó+:ErrorDeArchivos
+	int end=0;
+	int pipe=0; 			//0:Arch-->Arch,1:stdin-->Arch,2:Arch-->stdout,3:stdin-->stdout
 
 	if (argc < 2) {
-		fprintf(stderr, "Error de cantidad de parámetros ingresados, para ayuda ingrese -h \n");
-		return -1;
+		//ENCODER DESDE STDIN a STDOUT
+		modo=1;
+		pipe=3;
   	}
 
-	if (argc == 2 && strcmp(argv[1], "-h") == 0)
-		mensaje_ayuda();
+	else if (argc == 2){
+		if( strcmp(argv[1], "-h") == 0)
+			ejecutar =-1;
 
-	else if (strcmp(argv[1], "-V") == 0) {
-		printf("Versión del TP: %d \n", VERSION);
-		return 0;
-  	}
+		else if (strcmp(argv[1], "-V") == 0) {
+			ejecutar = -2;
+
+		} else if (strcmp(argv[1], "-d") == 0){
+			//DECODER DESDE STDIN a STDOUT
+			modo=2;
+			pipe=3;
+		} else {
+			ejecutar=1;
+		}
+	}
 
 	else if (argc > 2) {
-		int i;
-		for (i = 1; i < argc ; i++){
-			if ((strcmp(argv[i], "-i")) == 0)
-				input = argv[i + 1];
-			if ((strcmp(argv[i], "-o")) == 0)
-				output = argv[i + 1];
-			if ((strcmp(argv[i], "-d")) == 0)
+
+			for (int i = 1; i < argc ; i++){
+				if ((strcmp(argv[i], "-i")) == 0)
+					inputName = argv[i + 1];
+				if ((strcmp(argv[i], "-o")) == 0)
+					outputName = argv[i + 1];
+				if ((strcmp(argv[i], "-d")) == 0)
+					modo=2;
+			}
+
+			if (argc == 3) {
+
+					if (inputName != NULL) {
+						//ENCODER DESDE ARCHIVO a STDOUT
+						modo=1;
+						pipe=2;
+					} else if (outputName!=NULL){
+						//ENCODER DESDE STDIN a ARCHIVO
+						modo=1;
+						pipe=1;
+					} else {
+						ejecutar = 1;
+					}
+
+			} else if ((argc == 4) && (modo == 2)){
+
+					if (inputName != NULL) {
+						//DECODER DESDE ARCHIVO a STDOUT
+						pipe=2;
+					} else if (outputName != NULL){
+						//DECODER DESDE STDIN a ARCHIVO
+						pipe=1;
+					} else {
+						ejecutar=1;
+				}
+			} else if ((argc == 5) && (inputName != NULL) && (outputName != NULL)){
+				//ENCODER ARCHIVO A ARCHIVO
 				modo=1;
-		}
-			if (input != NULL && modo != 0) {
-				flag=decode(input,output);
-				while(flag!=0){
-					if (flag==3){
-						return 3;
-					}else if (flag==4){
-						output=splitter(input,modo);
-						flag=decode(input,output);
-						free(output);
-					}
-				}
-
-			} else if (input != NULL) {
-				flag=encode(input,output);
-				while(flag!=0){
-					if (flag==1){
-						return 1;
-					}else if (flag==2){
-						output=splitter(input,modo);
-						flag=encode(input,output);
-						free(output);
-					}
-				}
-
+				pipe=0;
+			} else if ((argc == 6) && (inputName != NULL) && (outputName != NULL) && (modo==2)){
+				//DECODER ARCHIVO A ARCHIVO
+				pipe=0;
+			} else {
+				ejecutar=1;
 			}
 	}
-  return 0;
+
+	if (ejecutar == 0){ //--> modo=1 ó 2
+		if (modo == 1) {
+			flag=encode(inputName,outputName,pipe);
+		} else {
+			flag=decode(inputName,outputName,pipe);
+		}
+
+		if ((flag == 2) || (flag == 4)) {
+			 fprintf(stderr,"Error al abrir el archivo de entrada %s.\n",inputName);
+		} else if ((flag == 3) || (flag == 5)){
+			fprintf(stderr,"Error al abrir el archivo de salida %s.\n",outputName);
+		}
+	} else	if (ejecutar == 1){
+		fprintf(stderr, "Error de parámetros ingresados, para ayuda ingrese -h \n");
+	} else if (ejecutar > 1) {
+		fprintf(stderr, "Error en archivos, para ayuda ingrese -h \n");
+	} else if (ejecutar == -1){
+		mensaje_ayuda();
+	} else if (ejecutar == -2) {
+		printf("Versión del TP: %d \n", VERSION);
+	}
+
+	return end;
 }
