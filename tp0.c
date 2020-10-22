@@ -114,6 +114,8 @@ int main(int argc, char *argv[]) {
 			 fprintf(stderr,"Error al abrir el archivo de entrada %s.\n",inputName);
 		} else if ((flag == 3) || (flag == 5)){
 			fprintf(stderr,"Error al abrir el archivo de salida %s.\n",outputName);
+		} else if (flag == -1) {
+			fprintf(stderr,"El archivo %s no está en Base 64.\n",inputName);
 		}
 	} else	if (ejecutar == 1){
 		fprintf(stderr, "Error de parámetros ingresados, para ayuda ingrese -h \n");

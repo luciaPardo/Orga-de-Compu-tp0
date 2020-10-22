@@ -23,7 +23,6 @@ int encode (char* input, char*output, int pipe){
 	if ((pipe == 0) || (pipe == 1)) {
 		salida = fopen(output,"w");
 		if (salida == NULL) {
-			fprintf(stderr,"Error al abrir el archivo de salida.\n");
 			flag=3;
 		}
 	} else {
