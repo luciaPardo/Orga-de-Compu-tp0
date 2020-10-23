@@ -6,18 +6,30 @@
  */
 #include "conversor.h"
 
-int decode (char* input,char* output){
+int decode (char* input, char*output, int pipe){
 
-	FILE* entrada = fopen(input,"r");
+	int flag=0;
+	FILE* entrada;
+	FILE* salida;
+
+	if ((pipe == 0) || (pipe == 2)){
+		entrada = fopen(input,"r");
 		if (entrada == NULL) {
-		  fprintf(stderr,"Error al abrir el archivo fuente.\n");
-		  return 3;
+			  flag=2;
 		}
-	FILE* salida = fopen(output,"w");
+	} else {
+		entrada = stdin;
+	}
+	if ((pipe == 0) || (pipe == 1)) {
+		salida = fopen(output,"w");
 		if (salida == NULL) {
-			fprintf(stderr,"Error al abrir el archivo de salida.\n");
-			return 4;
+			flag=3;
 		}
+	} else {
+		salida = stdout;
+	}
+
+	if (flag == 0){
 	char c;
 	int decimalBase64,bits,multiplo8,caracteresASCII,posicionEnCadenaDeBits,decimalAscii;
 
@@ -38,48 +50,58 @@ int decode (char* input,char* output){
 		while(!feof(entrada)){
 			if(c != '='){ //Ignoro los pads
 				decimalBase64 = valorBase64Equivalente(c);
-				decimalAbinario(caracterActualBinario,DECODER_BITS,decimalBase64);
+				if (decimalBase64!=-1){
+					decimalAbinario(caracterActualBinario,DECODER_BITS,decimalBase64);
 
-				temporal= concatenar(cadenaDeBits,caracterActualBinario);
-				cadenaDeBits = (char *) realloc(cadenaDeBits, strlen(temporal) + 1);
-				strcpy(cadenaDeBits, temporal);
-				free(temporal);
-				temporal=NULL;
+						temporal= concatenar(cadenaDeBits,caracterActualBinario);
+						cadenaDeBits = (char *) realloc(cadenaDeBits, strlen(temporal) + 1);
+						strcpy(cadenaDeBits, temporal);
+						free(temporal);
+						temporal=NULL;
+				} else {
+					flag=-1;
+					break;
+				}
 			}
 			c=fgetc(entrada);
 		}
-
-		bits=strlen(cadenaDeBits);
-		multiplo8=bits%ENCODER_BITS;
-		if(multiplo8 != 0){
-			for (int i=0; i<multiplo8; i++){
-				cadenaDeBits[bits-i]='\0';
+		if (flag != -1){
+			bits=strlen(cadenaDeBits);
+			multiplo8=bits%ENCODER_BITS;
+			if(multiplo8 != 0){
+				for (int i=0; i<multiplo8; i++){
+					cadenaDeBits[bits-i]='\0';
+				}
 			}
-		}
-		bits=strlen(cadenaDeBits);
-		caracteresASCII=bits/ENCODER_BITS;
-		posicionEnCadenaDeBits=0;
+			bits=strlen(cadenaDeBits);
+			caracteresASCII=bits/ENCODER_BITS;
+			posicionEnCadenaDeBits=0;
 
-		for(int i=0; i<caracteresASCII; i++){
-			for (int j=0;j<ENCODER_BITS;j++){
-					posicionEnCadenaDeBits=i*ENCODER_BITS+j;
-					cadenaAcodificar[j]=&(cadenaDeBits[posicionEnCadenaDeBits]);
+			for(int i=0; i<caracteresASCII; i++){
+				for (int j=0;j<ENCODER_BITS;j++){
+						posicionEnCadenaDeBits=i*ENCODER_BITS+j;
+						cadenaAcodificar[j]=&(cadenaDeBits[posicionEnCadenaDeBits]);
+				}
+				cadenaAcodificar[ENCODER_BITS]='\0';
+				decimalAscii=binarioAdecimal(cadenaAcodificar,ENCODER_BITS);
+				c=decimalAscii;
+				fputc(c,salida);
 			}
-			cadenaAcodificar[ENCODER_BITS]='\0';
-			decimalAscii=binarioAdecimal(cadenaAcodificar,ENCODER_BITS);
-			c=decimalAscii;
-			fputc(c,salida);
-		}
 
+		}
 	}
-
-	fclose(entrada);
-	fclose(salida);
+	if ((pipe == 0) || (pipe == 2)){
+		fclose(entrada);
+	}
+	if ((pipe == 0) || (pipe == 1)) {
+		fclose(salida);
+	}
 
 	free(caracterActualBinario);
 	caracterActualBinario=NULL;
 	free(cadenaDeBits);
 	cadenaDeBits=NULL;
+	}
 
-	return 0;
+	return flag;
 }

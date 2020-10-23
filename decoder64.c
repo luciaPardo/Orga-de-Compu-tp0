@@ -16,8 +16,10 @@ int valorBase64Equivalente (char alCaracter) {
 	while (codigo[decimal]!=alCaracter){
 		if(decimal<63)
 		decimal++;
-		else
+		else {
 		decimal = -1;
+		break;
+		}
 	}
 
 	return decimal;

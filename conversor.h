@@ -13,11 +13,9 @@
 #include <string.h>
 #define ENCODER_BITS 8
 #define DECODER_BITS 6
+#define VERSION 0
+#define MAX_BUFF 100
 
-/*Devuelve dos archivos abiertos con los nombres dados
- * Return 0 = OK o Return 2= Falló apertura
- * modo=1 -->'w' o modo=0 -->'r'*/
-int fileManager(FILE* archivo, char* nombre, int modo);
 
 /*Rellena una cadena de 8 o 6 bits con el codigo binario correspondiente al decimal de la tabla*/
 void decimalAbinario (char* cadena,int largoDeLaCadena, int decimalDeLaTabla);
@@ -38,12 +36,10 @@ char caracter64equivalente (int alDecimal);
 int valorBase64Equivalente (char alCaracter);
 
 /*Recibe un archivo de texto ASCII y crea una copia en Base64*/
-int encode (char* input,char* output);
+int encode (char* input, char* output, int pipe);
 
 /*Recibe un archivo de Texto en Base64 y crea una copia en ASCII*/
-int decode (char* input,char* output);
+int decode (char* input, char* output, int pipe);
 
-/*Crea un archivo cuando no se pasa el parametro -o*/
-char* splitter(char* input,int modo);
 
 #endif /* SOURCE_CONVERSOR_H_ */
