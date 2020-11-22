@@ -27,13 +27,13 @@ int main(int argc, char *argv[]) {
   	}
 
 	else if (argc == 2){
-		if( strcmp(argv[1], "-h") == 0)
+		if( (strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0) )
 			ejecutar =-1;
 
-		else if (strcmp(argv[1], "-V") == 0) {
+		else if ((strcmp(argv[1], "-V") == 0) || (strcmp(argv[1], "--version") == 0)) {
 			ejecutar = -2;
 
-		} else if (strcmp(argv[1], "-d") == 0){
+		} else if ((strcmp(argv[1], "-d") == 0) || (strcmp(argv[1], "--decode") == 0) ){
 			//DECODER DESDE STDIN a STDOUT
 			modo=2;
 			pipe=3;
@@ -45,11 +45,11 @@ int main(int argc, char *argv[]) {
 	else if (argc > 2) {
 
 			for (int i = 1; i < argc ; i++){
-				if ((strcmp(argv[i], "-i")) == 0)
+				if ( ((strcmp(argv[i], "-i")) == 0) || ((strcmp(argv[i], "--input")) == 0) )
 					inputName = argv[i + 1];
-				if ((strcmp(argv[i], "-o")) == 0)
+				if ( ((strcmp(argv[i], "-o")) == 0) || ((strcmp(argv[i], "--output")) == 0) )
 					outputName = argv[i + 1];
-				if ((strcmp(argv[i], "-d")) == 0)
+				if ( ((strcmp(argv[i], "-d")) == 0) || ((strcmp(argv[i], "--decode")) == 0) )
 					modo=2;
 			}
 

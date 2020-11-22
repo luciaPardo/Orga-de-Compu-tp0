@@ -16,7 +16,7 @@
 #define CHARPLANO 3
 #define CHARENCODIGO 4
 #define PAD 61
-#define HALT 92
+#define HALT 61
 #define END 10
 
 /*Devuelve el caracter de Base 64 correspondiente al decimal 0-63 dado

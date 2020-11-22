@@ -25,7 +25,7 @@ int encoder (FILE* entrada, FILE* salida){
 				captura[loop]=0;
 			}
 
-			while ((!feof(entrada)) && (c != HALT) && (lecturas < CHARPLANO)){ //Lectura parcial
+			while ((!feof(entrada)) /*&& (c != HALT)*/ && (lecturas < CHARPLANO)){ //Lectura parcial
 				c = fgetc(entrada);
 				if ((c != EOF) && (c != HALT)) {
 					captura[lecturas]= c;
