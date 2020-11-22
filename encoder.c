@@ -47,6 +47,7 @@ int encoder (FILE* entrada, FILE* salida){
 				//--------------------------------------------------------------------------------------------------------
 
 				for(loop=0; loop<escribir; loop++){
+					if((codigo[loop]!='\0')&&(codigo[loop]!='\00'))
 					fputc(codigo[loop],salida);
 				}
 				if (lecturas<CHARPLANO){
@@ -59,6 +60,6 @@ int encoder (FILE* entrada, FILE* salida){
 		}
 
 	}
-	fputc(END,salida);
+	//fputc(END,salida);
 	return flag;
 }

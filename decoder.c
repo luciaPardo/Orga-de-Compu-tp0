@@ -49,10 +49,12 @@ int decoder (FILE* entrada, FILE* salida){
 
 				if (lecturas == CHARENCODIGO) {
 					for(loop=0; loop<CHARPLANO; loop++){
+						if((codigo[loop]!='\0')&&(codigo[loop]!='\00'))
 						fputc(codigo[loop],salida);
 					}
 				} else {
 					for(loop=0; loop<lecturas; loop++){
+						if((codigo[loop]!='\0')&&(codigo[loop]!='\00'))
 						fputc(codigo[loop],salida);
 					}
 				}
@@ -60,6 +62,6 @@ int decoder (FILE* entrada, FILE* salida){
 			}
 		}
 	}
-	fputc(END,salida);
+	//fputc(END,salida);
 	return flag;
 }

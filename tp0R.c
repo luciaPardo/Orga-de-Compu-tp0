@@ -150,5 +150,6 @@ int main(int argc, char *argv[]) {
 		printf("Versión del TP: %c \n",VERSION);
 	}
 
+	printf("\n");
 	return end;
 }
